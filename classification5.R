@@ -45,6 +45,9 @@ stopCluster(cl)
 toClass <- stack(c(rasterlist, texlist))
 Sys.time()
 
+#mask
+toClass <- toClass * (mask-1)
+
 #extract values in trainig shapefile
 values <- extract(toClass, xx, df = TRUE)
 #take out the attributr table of the trainig and assigne ID to polygons
@@ -128,7 +131,7 @@ system.time(
 #predict on raster
 system.time(
 predraster <- predict(toClass2, modelRF,
-                      filename = "C:\\Users\\Haniyeh\\Hoa_Binh\\NDBaI\\classification\\classification-soil-urbanRoof.tif",
+                      filename = "C:\\Users\\Haniyeh\\Hoa_Binh\\NDBaI\\classification\\classification-soil-urbanRoof2.tif",
                       na.rm=T,inf.rm = TRUE)
 )
 
