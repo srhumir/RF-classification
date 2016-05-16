@@ -12,12 +12,11 @@ library(parallel)
 #input data
 soilurban <- raster(file.choose())
 soilroof <- raster(file.choose())
-#values over 5 are not soil so convert them to 1 and soils to zero
-soilurban <- soilurban %/% 5
+soilurban <- calc(soilurban, as.integer)
+#values over 5 or 6 are not soil so convert them to 1 and soils to zero
+soilurban <- soilurban %/% 6
 soilroof <- soilroof %/% 5
-#get sure about NA values
-soilurban <- calc(soilurban, sign)
-soilurban <- calc(soilroof, function(x) x * (x != -1))
+
 #now that in both rasters, soils are 0 and urbans are 1 make a function that inion soil pixels
 sumNA <- function(a){
   #if (sum(is.na(a)) >= 2) return(NA)
@@ -28,6 +27,7 @@ sumNA <- function(a){
 }
 #use function above to produce soil raster (i.e 1 at soil pixels and NA elswhere)
 soil <- calc(stack(soilurban, soilroof), sumNA)
+writeRaster(soil,file.choose())
 #load MNF
 MNF <- stack(file.choose())
 MNF <- dropLayer(MNF, c(5,6))
@@ -114,7 +114,9 @@ modelrf <- train(valuesNAfilled[,-1], factor(cut), trControl=train_control, meth
 
 system.time(
   predraster <- predict(toclass2, modelrf, 
-                        filename = "C:\\Users\\Haniyeh\\Hoa_Binh\\NDBaI\\classification\\classification-soilS.tif",
                         na.rm=T,inf.rm = TRUE)
 )
 
+predraster <- calc(predraster, as.integer)
+writeRaster(predraster, file.choose())
+predshape <- rasterToPolygons(predraster)
