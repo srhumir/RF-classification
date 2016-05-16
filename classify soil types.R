@@ -62,7 +62,7 @@ toclass2 <- toclass * soil
 xx <- readShapePoly(file.choose())
 projection(xx) <- projection(MNF)
 #extract 
-values <- extract(toclass, xx, df = TRUE)
+values <- extract(toclass2, xx, df = TRUE)
 #take out the attributr table of the trainig and assigne ID to polygons
 classes <- data.frame(ID = 1:length(xx@data$CLASS_NAME), xx@data)
 #Assign class to extracted values
@@ -101,7 +101,7 @@ distances <- dist(valuesNormal)
 clus <- hclust(distances)
 plot(clus)
 #
-cut <- cutree(clus, h=6)
+cut <- cutree(clus, h=5)
 table(Class, cut)
 
 
@@ -110,5 +110,11 @@ train_control <- trainControl(method="cv", number=10)
 
 system.time(
 modelrf <- train(valuesNAfilled[,-1], factor(cut), trControl=train_control, method = "rf")
+)
+
+system.time(
+  predraster <- predict(toclass2, modelrf, 
+                        filename = "C:\\Users\\Haniyeh\\Hoa_Binh\\NDBaI\\classification\\classification-soilS.tif",
+                        na.rm=T,inf.rm = TRUE)
 )
 
